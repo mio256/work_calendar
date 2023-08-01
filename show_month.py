@@ -1,7 +1,4 @@
-from __future__ import print_function
-
-import sys
-import csv
+import pprint
 import datetime
 import os.path
 import calendar
@@ -17,6 +14,17 @@ SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
 
 
 def main():
+    data = get_calendar_data()
+    pprint.pprint(data)
+
+
+def get_nth_week2_datetime_dt(dt, firstweekday=0):
+    first_dow = dt.replace(day=1).weekday()
+    offset = (first_dow - firstweekday) % 7
+    return (dt.day + offset - 1) // 7 + 1
+
+
+def get_calendar_data():
     """Shows basic usage of the Google Calendar API.
     Prints the start and name of the next 10 events on the user's calendar.
     """
@@ -54,13 +62,16 @@ def main():
             print('No upcoming events found.')
             return
 
-        with open(sys.argv[1], 'w') as f:
-            for event in events:
-                start = event['start'].get('dateTime', event['start'].get('date'))
-                end = event['end'].get('dateTime', event['end'].get('date'))
-                time = datetime.datetime.fromisoformat(end) - datetime.datetime.fromisoformat(start)
-                writer = csv.writer(f)
-                writer.writerow([start, end, time, event['summary']])
+        data = [{}, {}, {}, {}, {}, {}, {}]
+        for event in events:
+            start = event['start'].get('dateTime', event['start'].get('date'))
+            end = event['end'].get('dateTime', event['end'].get('date'))
+            time = datetime.datetime.fromisoformat(end) - datetime.datetime.fromisoformat(start)
+            try:
+                data[get_nth_week2_datetime_dt(datetime.datetime.fromisoformat(start))][event['summary']] += time.seconds//60
+            except:
+                data[get_nth_week2_datetime_dt(datetime.datetime.fromisoformat(start))][event['summary']] = time.seconds//60
+        return data
 
     except HttpError as error:
         print('An error occurred: %s' % error)
