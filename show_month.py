@@ -50,10 +50,10 @@ def get_calendar_data():
         service = build('calendar', 'v3', credentials=creds)
 
         # Call the Calendar API
-        now = datetime.datetime.utcnow()
+        last_month = datetime.datetime.utcnow() - datetime.timedelta(days=7)
         events_result = service.events().list(calendarId='primary',
-                                              timeMin=datetime.datetime(now.year, now.month, 1, 0, 0).isoformat() + '+09:00',
-                                              timeMax=datetime.datetime(now.year, now.month, calendar.monthrange(now.year, now.month)[1], 23, 59).isoformat() + '+09:00',
+                                              timeMin=datetime.datetime(last_month.year, last_month.month, 1, 0, 0).isoformat() + '+09:00',
+                                              timeMax=datetime.datetime(last_month.year, last_month.month, calendar.monthrange(last_month.year, last_month.month)[1], 23, 59).isoformat() + '+09:00',
                                               singleEvents=True,
                                               orderBy='startTime').execute()
         events = events_result.get('items', [])
