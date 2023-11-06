@@ -1,7 +1,5 @@
-import pprint
 import datetime
-import os.path
-import calendar
+import os
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -12,9 +10,7 @@ from googleapiclient.errors import HttpError
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
 
-
-def main():
-    get_calendar_data()
+LIMIT = 50
 
 
 def get_nth_week2_datetime_dt(dt, firstweekday=0):
@@ -65,13 +61,15 @@ def get_calendar_data():
             print('No upcoming events found.')
             return
 
-        print(f'Available work time : {96/30*days}h')
+        print(f'Available work time : {LIMIT/30*days}h')
         worktime = 0
         for event in events:
-            start = event['start'].get('dateTime', event['start'].get('date'))
-            end = event['end'].get('dateTime', event['end'].get('date'))
-            duration_seconds = (datetime.datetime.fromisoformat(end) - datetime.datetime.fromisoformat(start)).total_seconds()
-            worktime += duration_seconds / 3600  # Convert seconds to hours
+            if event['status'] == 'confirmed':
+                print(event['summary'])
+                start = event['start'].get('dateTime', event['start'].get('date'))
+                end = event['end'].get('dateTime', event['end'].get('date'))
+                duration_seconds = (datetime.datetime.fromisoformat(end) - datetime.datetime.fromisoformat(start)).total_seconds()
+                worktime += duration_seconds / 3600  # Convert seconds to hours
         print(f'Work time : {worktime}h')
 
     except HttpError as error:
@@ -79,4 +77,4 @@ def get_calendar_data():
 
 
 if __name__ == '__main__':
-    main()
+    get_calendar_data()
