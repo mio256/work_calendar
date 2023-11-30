@@ -44,10 +44,15 @@ def get_date_range():
     return month_start, month_end
 
 
-def process_events(events):
+def process_events(events, email):
     """Process events, group by weeks and sum up durations for appointments with the same name."""
+    worktime = 0
     events_by_week = collections.defaultdict(lambda: collections.defaultdict(float))
     for event in events:
+        if event.get('attendees'):
+            user_attendee = next((attendee for attendee in event['attendees'] if attendee['email'] == email), None)
+            if user_attendee and user_attendee['responseStatus'] == 'declined':
+                continue
         event_name = event['summary']
         start = event['start'].get('dateTime', event['start'].get('date'))
         end = event['end'].get('dateTime', event['end'].get('date'))
@@ -55,12 +60,15 @@ def process_events(events):
         event_date = datetime.datetime.fromisoformat(start)
         week_number = event_date.isocalendar()[1]
         events_by_week[week_number][event_name] += duration_hours
+        worktime += duration_hours
 
     for week, events in events_by_week.items():
         print(f"Week {week}:")
         for event_name, total_hours in events.items():
             print(f"    {event_name}")
             print(f"        {total_hours}")
+
+    print(f'# Work time: {worktime}h')
 
 
 def get_calendar_data():
@@ -73,12 +81,13 @@ def get_calendar_data():
         print(f'Getting events for the last month ({month_start} - {month_end})')
 
         events_result = service.events().list(calendarId='primary', timeMin=month_start, timeMax=month_end, singleEvents=True, orderBy='startTime').execute()
+        email = events_result.get('summary')
         events = events_result.get('items', [])
 
         if not events:
             print('No events found for the last month.')
         else:
-            process_events(events)
+            process_events(events, email)
 
     except HttpError as error:
         print(f'An error occurred: {error}')
