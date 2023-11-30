@@ -59,7 +59,8 @@ def process_events(events):
     for week, events in events_by_week.items():
         print(f"Week {week}:")
         for event_name, total_hours in events.items():
-            print(f"  {event_name}: {total_hours} hours")
+            print(f"    {event_name}")
+            print(f"        {total_hours}")
 
 
 def get_calendar_data():
