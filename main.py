@@ -39,8 +39,8 @@ def get_date_range():
     first_day_this_month = datetime.datetime(now.year, now.month, 1)
     last_day_last_month = first_day_this_month - datetime.timedelta(days=1)
     first_day_last_month = datetime.datetime(last_day_last_month.year, last_day_last_month.month, 1)
+    month_end = datetime.datetime(last_day_last_month.year, last_day_last_month.month, last_day_last_month.day, 23, 59).isoformat() + TIMEZONE_OFFSET
     month_start = first_day_last_month.isoformat() + TIMEZONE_OFFSET
-    month_end = last_day_last_month.isoformat() + TIMEZONE_OFFSET
     return month_start, month_end
 
 
