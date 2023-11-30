@@ -55,21 +55,26 @@ def get_calendar_data():
                                               timeMax=today_end,
                                               singleEvents=True,
                                               orderBy='startTime').execute()
+        email = events_result.get('summary')
         events = events_result.get('items', [])
 
         if not events:
             print('No upcoming events found.')
             return
 
-        print(f'Available work time : {LIMIT/30*days}h')
         worktime = 0
         for event in events:
-            if event['status'] == 'confirmed':
-                print(event['summary'])
-                start = event['start'].get('dateTime', event['start'].get('date'))
-                end = event['end'].get('dateTime', event['end'].get('date'))
-                duration_seconds = (datetime.datetime.fromisoformat(end) - datetime.datetime.fromisoformat(start)).total_seconds()
-                worktime += duration_seconds / 3600  # Convert seconds to hours
+            print(event['summary'], end=' ')
+            if event.get('attendees', []):
+                user_attendee = next((attendee for attendee in event['attendees'] if attendee['email'] == email), None)
+                if user_attendee and user_attendee['responseStatus'] == 'declined':
+                    print('declined')
+                    continue
+            start = event['start'].get('dateTime', event['start'].get('date'))
+            end = event['end'].get('dateTime', event['end'].get('date'))
+            hours = (datetime.datetime.fromisoformat(end) - datetime.datetime.fromisoformat(start)).total_seconds() / 3600
+            print(hours)
+            worktime += hours
         print(f'Work time : {worktime}h')
 
     except HttpError as error:
