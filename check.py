@@ -34,7 +34,7 @@ def load_credentials():
 
 def get_date_range():
     """Get the start of the month and the end of the current day."""
-    now = datetime.datetime.utcnow()
+    now = datetime.datetime.now()
     month_start = datetime.datetime(now.year, now.month, 1, 0, 0).isoformat() + TIMEZONE_OFFSET
     today_end = datetime.datetime(now.year, now.month, now.day, 23, 59).isoformat() + TIMEZONE_OFFSET
     return month_start, today_end
@@ -68,6 +68,7 @@ def get_calendar_data():
     try:
         service = build('calendar', 'v3', credentials=creds)
         month_start, today_end = get_date_range()
+        print(f'Getting events until today ({month_start} - {today_end})')
 
         events_result = service.events().list(calendarId='primary', timeMin=month_start, timeMax=today_end, singleEvents=True, orderBy='startTime').execute()
         email = events_result.get('summary')

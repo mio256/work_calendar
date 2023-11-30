@@ -35,7 +35,7 @@ def load_credentials():
 
 def get_date_range():
     """Get the start and end of the previous month."""
-    now = datetime.datetime.utcnow()
+    now = datetime.datetime.now()
     first_day_this_month = datetime.datetime(now.year, now.month, 1)
     last_day_last_month = first_day_this_month - datetime.timedelta(days=1)
     first_day_last_month = datetime.datetime(last_day_last_month.year, last_day_last_month.month, 1)
@@ -70,6 +70,7 @@ def get_calendar_data():
     try:
         service = build('calendar', 'v3', credentials=creds)
         month_start, month_end = get_date_range()
+        print(f'Getting events for the last month ({month_start} - {month_end})')
 
         events_result = service.events().list(calendarId='primary', timeMin=month_start, timeMax=month_end, singleEvents=True, orderBy='startTime').execute()
         events = events_result.get('items', [])
