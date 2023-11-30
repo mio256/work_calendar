@@ -56,17 +56,17 @@ def process_events(events, email):
         event_name = event['summary']
         start = event['start'].get('dateTime', event['start'].get('date'))
         end = event['end'].get('dateTime', event['end'].get('date'))
-        duration_hours = (datetime.datetime.fromisoformat(end) - datetime.datetime.fromisoformat(start)).total_seconds() / 3600
+        duration_minutes = (datetime.datetime.fromisoformat(end) - datetime.datetime.fromisoformat(start)).total_seconds() / 60
         event_date = datetime.datetime.fromisoformat(start)
         week_number = event_date.isocalendar()[1]
-        events_by_week[week_number][event_name] += duration_hours
-        worktime += duration_hours
+        events_by_week[week_number][event_name] += duration_minutes
+        worktime += duration_minutes / 60
 
     for week, events in events_by_week.items():
         print(f"Week {week}:")
-        for event_name, total_hours in events.items():
+        for event_name, total_minutes in events.items():
             print(f"    {event_name}")
-            print(f"        {total_hours}")
+            print(f"        {total_minutes}")
 
     print(f'# Work time: {worktime}h')
 
