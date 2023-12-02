@@ -44,7 +44,8 @@ def process_events(events, email):
     """Process and print event details, calculate total work time."""
     worktime = 0
     for event in events:
-        print(event['summary'])
+        start = event['start'].get('dateTime', event['start'].get('date'))
+        print(datetime.datetime.fromisoformat(start), event['summary'])
 
         if event.get('attendees'):
             user_attendee = next((attendee for attendee in event['attendees'] if attendee['email'] == email), None)
@@ -52,7 +53,6 @@ def process_events(events, email):
                 print(f"    declined")
                 continue
 
-        start = event['start'].get('dateTime', event['start'].get('date'))
         end = event['end'].get('dateTime', event['end'].get('date'))
         duration_hours = (datetime.datetime.fromisoformat(end) - datetime.datetime.fromisoformat(start)).total_seconds() / 3600
         print(f"    {duration_hours}")
