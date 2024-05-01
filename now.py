@@ -16,6 +16,7 @@ TIMEZONE_OFFSET = 'Z'
 # Email
 EMAIL = 'r-oishi@renatus-robotics.com'
 
+
 def load_credentials():
     """Load or refresh credentials for Google API."""
     if os.path.exists(TOKEN_FILE):
@@ -36,13 +37,14 @@ def load_credentials():
 
 
 def get_date_range():
-    """Get the start and end of the previous month."""
+    """Get the start and end of the current month."""
     now = datetime.datetime.now()
     first_day_this_month = datetime.datetime(now.year, now.month, 1)
-    last_day_last_month = first_day_this_month - datetime.timedelta(days=1)
-    first_day_last_month = datetime.datetime(last_day_last_month.year, last_day_last_month.month, 1)
-    month_end = datetime.datetime(last_day_last_month.year, last_day_last_month.month, last_day_last_month.day, 23, 59).isoformat() + TIMEZONE_OFFSET
-    month_start = first_day_last_month.isoformat() + TIMEZONE_OFFSET
+    next_month = first_day_this_month + datetime.timedelta(days=31)
+    first_day_next_month = datetime.datetime(next_month.year, next_month.month, 1)
+    month_end = datetime.datetime(first_day_next_month.year, first_day_next_month.month, 1) - datetime.timedelta(seconds=1)
+    month_start = first_day_this_month.isoformat() + TIMEZONE_OFFSET
+    month_end = month_end.isoformat() + TIMEZONE_OFFSET
     return month_start, month_end
 
 
